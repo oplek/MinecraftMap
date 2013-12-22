@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Deneb</title>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="data.js" type="text/javascript"></script>
+<script src="funcs.js?v=15" type="text/javascript"></script>
+
+<style type="text/css">
+	* { margin: 0; padding: 0; }
+	#canvas { 
+		cursor: move;
+		position: absolute;
+		left: 0px;
+		top: 0px;
+	}
+	#canvas.interact {
+		cursor: alias;
+	}
+	
+	#canvasbg { 
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		width: 100%;
+		height: 100%;
+	}
+	
+	#buttonBar {
+		position: absolute;
+		bottom: 0px;
+		left: 0px;
+		padding: 5px 0px 10px 20px;
+		width: 98%;
+		
+		background-color: rgba(0,0,0,0.8);
+		color: white;
+	
+	}
+	
+	#buttonBar > a, #buttonBar > button {
+		float: left;
+		margin-right: 10px;
+		color: white;
+	}
+	
+	#buttonBar > button {
+			color: black;
+	}
+	
+	.floatRight { 
+		float: right; 
+		width: 400px; 
+	}
+	.floatRight .col {
+		float: left;
+		width: 100px;
+	}
+	
+	.floatRight.block {
+	}
+	
+	#mapOptions {
+		float: left;
+		width: 90px;
+		background-color: white;
+		border: solid thin grey;
+		position: relative;
+		height: 18px;
+		margin-right: 10px;
+		cursor: pointer;
+		text-align: center;
+		color: black;
+	}
+	
+	#mapOptionsPanel {
+		position: absolute;
+		bottom: 18px;
+		left: 0px;
+		width: 380px;
+		display: none;
+		background-color: white;
+	}
+	
+	#mapOptions a { color: black; }
+	
+	#mapOptions:hover #mapOptionsPanel {
+		display: block;
+	}
+	
+	#mapOptionsPanel .row {
+		text-align: left;
+		clear: both;
+		padding: 10px;
+	}
+	
+	#mapOptionsPanel .row label {
+		float: left;
+		width: 200px;
+	}
+	
+	#mapOptionsPanel .row input {
+		width: 90px;
+	}
+	
+	#photoViewer {
+		position: absolute;
+		width: 800px;
+		height: 600px;
+		border: solid 2px grey;
+		-moz-box-shadow: 10px 10px 5px rgba(0,0,0,0.3);
+		-webkit-box-shadow: 10px 10px 5px  rgba(0,0,0,0.3);
+		box-shadow: 10px 10px 5px  rgba(0,0,0,0.3);
+		-moz-border-radius: 15px;
+		border-radius: 15px;
+		background-color: black;
+		display: none;
+		overflow: hidden;
+	}
+	
+	#photoViewer img {
+		position: absolute;
+		left: 0px;
+		top:0px;
+
+	}
+	
+	#hovers { 
+		position: absolute;
+		left: 0px;
+		top: 0px;
+	}
+	
+	#hovers .hover {
+		position: absolute;
+		width: 20px;
+		height: 20px;
+		cursor: alias;
+		border: solid 1px rgba(0,0,255,0.3);
+	}
+	
+</style>
+
+
+</head>
+<body>
+	<canvas id="canvasbg" width="100%" height="100%">
+		Ye need HTML5-compatible browser for this.
+	</canvas>
+	<canvas id="canvas" width="100%" height="100%">
+		Ye need HTML5-compatible browser for this.
+	</canvas>
+	<div id="hovers"><!--e--></div>
+	<div id='buttonBar'>
+		<div class="floatRight block">
+			<div class='col'>Cursor:</div>
+			<div class='col' id="xpos"></div>
+			<div class='col' id="zpos"></div>
+			<div class='col' id="biome"></div>
+		</div>
+
+		<!--<a href="/deneb1/" target='_blank'>Archived Deneb 1</a>
+		<a href="/user/login">Login</a>-->
+		<button onclick="map.reset()" >Reset</button>
+		<button onclick="map.zoomIn()">Zoom In</button>
+		<button onclick="map.zoomOut()">Zoom Out</button>
+		<button onclick="map.toggleWorld()" id="toggleButton">Switch to Netherworld</button>
+
+		<div id="mapOptions">
+			Map Options
+			<div id="mapOptionsPanel">
+				<div class='row'>
+					<label for="var_range">Biome Range:</label><input id="var_range" onchange="map.updateVar('range',this.value)" value="" />m
+				</div>
+				<div class='row'>
+					<label for="var_pwidth">Line Render Pixel Width:</label><input id="var_pwidth" onchange="map.updateVar('pwidth',this.value,'uint_1')" value="" />px
+				</div>
+				<div class='row'>
+					<label for="var_pwidth">Boundary Fuzziness:</label><input id="var_fuzzy" onchange="map.updateVar('fuzzy',this.value)" value="" />m
+				</div>
+				<div class='row'>
+					<label for="var_lineDelay">Line Render Speed:</label><input id="var_lineDelay" onchange="map.updateVar('lineDelay',this.value)" value="" />ms
+				</div>
+				<div class='row'>
+					<label for="var_aa">Anti-alias radius:</label><input id="var_aa" onchange="map.updateVar('aa',this.value,'uint')" value="" />px
+				</div>
+				</div>
+		</div>
+		
+	</div>
+	
+	<div id="photoViewer"></div>
+</body>
+</html>
