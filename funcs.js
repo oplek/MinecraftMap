@@ -1393,10 +1393,10 @@ var map = {
 			e = data.terrain.overworld[i];
 			dist = map.distSqr(e.x,e.z,x,y);
 			
-			var n = map.vars.perlin.noise(x/10,y/10,0);
-			var rand = (n+1) * r*r/10;
+			//var n = map.vars.perlin.noise(x/10,y/10,0);
+			//var rand = (n+1) * r*r/10;
 						
-			if ( dist < map.vars.range * map.vars.range & dist + rand < min) {
+			if ( dist < map.vars.range * map.vars.range) {
 				min = dist;
 				min_index = i;
 				biome = e.type;
