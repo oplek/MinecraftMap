@@ -1,0 +1,131 @@
+<?php
+
+
+function misc_node_update($node) {
+	//_misc_update($node);
+}
+function misc_node_insert($node) {
+	//_misc_update($node);
+}
+function misc_node_view($node) {
+	_misc_update($node);
+}
+
+function _misc_update(&$nodeSaving) {
+	$res = db_query("SELECT * FROM {node}");
+	$out = "var data={";
+	
+	$overworld = array();
+	$netherworld = array();
+	
+	foreach($res as $row) {
+		if ( $row->nid == $nodeSaving->nid ) {
+			$node = $nodeSaving;
+			//node_save($node);
+			$node = node_load($row->nid);
+			//drupal_set_message(print_r($node,true));
+		} else {
+			$node = node_load($row->nid);
+		}
+		
+		/* 
+		oplekCity: {//
+			type: "castle",
+			coords: {x: 1763, y: 105, z:-520},
+			name: "Oplek's Place",
+			portal: "oplek_a",
+			biome: "desert"
+		},
+		*/
+		
+		
+
+		if ( $node->type == "location" ) {
+		
+			$type = @$node->field_type['und'][0]['value'];
+			$type2 = @$node->field_type2['und'][0]['value'];
+			$cx = @$node->field_coordinates['und'][0]['value'];
+			$cz = @$node->field_coordinates['und'][1]['value'];
+			$portal = @$node->field_portal['und'][0]['value'];
+				//$portal = $portal ? "n{$portal}" : null;
+			$world = @$node->field_world['und'][0]['value'];
+			$subtype = @$node->field_subtype['und'][0]['value'];
+			$title = str_replace('"',"'",$node->title);
+			
+			$photos = array();
+			if ( @$node->field_photo['und'] && is_array($node->field_photo['und']) ) {
+				foreach(@$node->field_photo['und'] as $k=>$v) {
+					$f = str_replace("public://","sites/default/files/",$v['uri']);
+					$res = getimagesize($f);
+					$photos[] = '{file:"/' . $f . '",w:' . $res[0] .',h:' . $res[1] . '}'; 
+				}
+			}
+			$photos = implode(', ',$photos);
+			
+			$isSample = $subtype == "sample" ? "true" : "false";
+				
+			if ( $world == "overworld" ) {
+			
+				$overworld[] = "{
+				\"type\":\"{$type2}\", 
+				\"coords\":{\"x\":{$cx},\"z\":{$cz}}, 
+				\"name\":\"{$title}\", 
+				\"portal\":\"{$portal}\", 
+				\"biome\":\"{$type}\",
+				\"sample\":{$isSample},
+				\"photos\":[{$photos}]
+				}";
+			
+			} else {
+			
+				$netherworld[] = "{
+				\"type\":\"{$type2}\", 
+				\"coords\":{\"x\":{$cx},\"z\":{$cz}}, 
+				\"name\":\"{$title}\", 
+				\"portal\":\"{$portal}\", 
+				\"biome\":\"{$type}\",
+				\"photos\":[{$photos}]
+				}";
+			
+			}
+		
+		} else if ( $node->type == "portal" ) {
+			//print_r($node);
+			
+			$type = @$node->field_type['und'][0]['value'];
+			$cx = @$node->field_coordinates['und'][0]['value'];
+			$cz = @$node->field_coordinates['und'][1]['value'];
+			//$connectsTo = @$node->field_connects_to['und'][0]['nid'];
+			//	$connectsTo = $connectsTo ? "n{$connectsTo}" : null;
+			$world = @$node->field_world['und'][0]['value'];
+			$subtype = @$node->field_subtype['und'][0]['value'];
+			$title = str_replace('"',"'",$node->title);
+			
+			if ( $world == "overworld" ) {
+			
+				$overworld[] = "{
+				\"type\":\"portal\", 
+				\"coords\":{\"x\":{$cx},\"z\":{$cz}}, 
+				\"name\":\"{$title}\",  
+				\"biome\":\"{$type}\"
+				}";
+			
+			} else {
+			
+				$netherworld[] = "{
+				\"type\":\"portal\", 
+				\"coords\":{\"x\":{$cx},\"z\":{$cz}}, 
+				\"name\":\"{$title}\",  
+				\"biome\":\"{$type}\"
+				}";
+			
+			}
+		}
+	
+	}
+	$out .= "\"overworld\":[" . implode(",\n",$overworld) . "],\n\"netherworld\":[" . implode(",\n",$netherworld) . "]";
+	
+	$out .= "};";
+	file_put_contents("sites/default/files/data.js",$out);
+
+}

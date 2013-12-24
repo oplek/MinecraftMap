@@ -1,0 +1,5 @@
+name = Misc Modifications
+description = 
+package = Core
+version = VERSION
+core = 7.x
