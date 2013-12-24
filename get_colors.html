@@ -1,9 +1,19 @@
 <html>
 <head>
-	<style>
-	canvas { border: #DDD 10px solid; }
-	</style>
 	<script>
+	
+	todo = new Array(
+		'beach','cold-beach','deep-ocean','frozenRiver','ocean','river','stone-beach',
+		'swamp','swamp-m','icePlains','icePlainsSpikes','savanna','savannaM','savannaPlateau',
+		'savannaPlateaM','sunflowerPlains','birch-forest','birch-forest-hills','birch-forest-m',
+		'snowy-taiga','cold-taiga-hills','cold-taiga-m','flower-forest','forest','hillyForest',
+		'jungle','jungleEdge','jungleM','megaSpruceTaiga','megaSpruceTaigaHills','megaTaiga',
+		'megaTaigaHills','roofed-forest','roofed-forest-m','taiga','taigaHills','taigaM',
+		'desert','desertHills','desertM','mesa','mesa-bryce','mesa-plateau','mesa-plateau-f',
+		'mesa-plateau-fm','mesa-plateau-m','extremeHills','extremeHillsM','extremeHillsPlus',
+		'iceMountain','mushroomisland','mushroomisland shore'
+	);
+	
 	function interp_image(){
 		
 		var img = document.getElementById('theimage');
