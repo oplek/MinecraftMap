@@ -5,14 +5,26 @@
 	todo = new Array(
 		'beach','cold-beach','deep-ocean','frozenRiver','ocean','river','stone-beach',
 		'swamp','swamp-m','icePlains','icePlainsSpikes','savanna','savannaM','savannaPlateau',
-		'savannaPlateaM','sunflowerPlains','birch-forest','birch-forest-hills','birch-forest-m',
+		'savannaPlateauM','sunflowerPlains','birch-forest','birch-forest-hills','birch-forest-m',
 		'snowy-taiga','cold-taiga-hills','cold-taiga-m','flower-forest','forest','hillyForest',
 		'jungle','jungleEdge','jungleM','megaSpruceTaiga','megaSpruceTaigaHills','megaTaiga',
 		'megaTaigaHills','roofed-forest','roofed-forest-m','taiga','taigaHills','taigaM',
 		'desert','desertHills','desertM','mesa','mesa-bryce','mesa-plateau','mesa-plateau-f',
 		'mesa-plateau-fm','mesa-plateau-m','extremeHills','extremeHillsM','extremeHillsPlus',
-		'iceMountain','mushroomisland','mushroomisland shore'
+		'iceMountain','mushroomisland','mushroomisland-shore'
 	);
+	
+	function get_each_sample(){
+		
+		var img = document.getElementById('theimage');
+		for (biome in todo){
+			
+			var fname = 'samples/' + todo[biome] + '.png';
+			img.src = fname;
+			
+		}
+		
+	}
 	
 	function interp_image(){
 		
@@ -34,14 +46,16 @@
 		}
 		results.innerHTML = "[" + rows.join(",<BR>") + "]";
 	}
-	var getHex = function(num) {
+	
+	function getHex(num) {
 	    var hex = "00" + Number(num).toString(16);
 	    return hex.substring(hex.length - 2);
 	}
+	
 	</script>
 </head>
-<body onLoad="interp_image()">
-	<img id="theimage" src="desert.png" style='display:none'/>
+<body onLoad="get_each_sample()">
+	<img id="theimage" src="" style='display:none'/>
 	<canvas id="thecanvas" width="10" height="10"></canvas>
 	<div id='results'></div>
 </body>
