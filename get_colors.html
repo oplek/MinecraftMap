@@ -3,30 +3,38 @@
 	<script>
 	
 	todo = new Array(
-		'beach','cold-beach','deep-ocean','frozenRiver','ocean','river','stone-beach',
-		'swamp','swamp-m','icePlains','icePlainsSpikes','savanna','savannaM','savannaPlateau',
-		'savannaPlateauM','sunflowerPlains','birch-forest','birch-forest-hills','birch-forest-m',
-		'snowy-taiga','cold-taiga-hills','cold-taiga-m','flower-forest','forest','hillyForest',
+		'beach','cold beach','deep ocean','frozenRiver','ocean','river','stone beach',
+		'swamp','swamp m','icePlains','icePlainsSpikes','savanna','savannaM','savannaPlateau',
+		'savannaPlateauM','sunflowerPlains','birch forest','birch forest hills','birch forest m',
+		'snowy taiga','cold taiga hills','cold taiga m','flower forest','forest','hillyForest',
 		'jungle','jungleEdge','jungleM','megaSpruceTaiga','megaSpruceTaigaHills','megaTaiga',
-		'megaTaigaHills','roofed-forest','roofed-forest-m','taiga','taigaHills','taigaM',
-		'desert','desertHills','desertM','mesa','mesa-bryce','mesa-plateau','mesa-plateau-f',
-		'mesa-plateau-fm','mesa-plateau-m','extremeHills','extremeHillsM','extremeHillsPlus',
-		'iceMountain','mushroomisland','mushroomisland-shore'
+		'megaTaigaHills','roofed forest','roofed forest m','taiga','taigaHills','taigaM',
+		'desert','desertHills','desertM','mesa','mesa bryce','mesa plateau','mesa plateau f',
+		'mesa plateau fm','mesa plateau m','extremeHills','extremeHillsM','extremeHillsPlus',
+		'iceMountain','mushroomisland','mushroomisland shore'
 	);
 	
 	function get_each_sample(){
 		
 		var img = document.getElementById('theimage');
+		var canvas = document.getelementById('thecanvas');
+		var sample = canvas.getcontext("2d");
+		
 		for (biome in todo){
 			
+			sample.drawImage(img, 0, 0, img.height, img.width);
 			var fname = 'samples/' + todo[biome] + '.png';
-			img.src = fname;
+			var hexArray = getHexArray(sample);
 			
 		}
 		
 	}
 	
-	function interp_image(){
+	function write_image(img, fname, sample){
+		
+	}
+	
+	function getHexArray(){
 		
 		var img = document.getElementById('theimage');
 		var thecanvas = document.getElementById('thecanvas');
