@@ -8,6 +8,7 @@
 
 <style type="text/css">
 	* { margin: 0; padding: 0; }
+	
 	#canvas { 
 		cursor: move;
 		position: absolute;
@@ -139,54 +140,61 @@
 		border: solid 1px rgba(0,0,255,0.3);
 	}
 	
+	#mainClip, #hovers {
+		overflow: hidden;
+	}
+	
 </style>
 
 
 </head>
 <body>
-	<canvas id="canvasbg" width="100%" height="100%">
-		Ye need HTML5-compatible browser for this.
-	</canvas>
-	<canvas id="canvas" width="100%" height="100%">
-		Ye need HTML5-compatible browser for this.
-	</canvas>
-	<div id="hovers"><!--e--></div>
-	<div id='buttonBar'>
-		<div class="floatRight block">
-			<div class='col'>Cursor:</div>
-			<div class='col' id="xpos"></div>
-			<div class='col' id="zpos"></div>
-			<div class='col' id="biome"></div>
-		</div>
-
-		<!--<a href="/deneb1/" target='_blank'>Archived Deneb 1</a>
-		<a href="/user/login">Login</a>-->
-		<button onclick="map.reset()" >Reset</button>
-		<button onclick="map.zoomIn()">Zoom In</button>
-		<button onclick="map.zoomOut()">Zoom Out</button>
-		<button onclick="map.toggleWorld()" id="toggleButton">Switch to Netherworld</button>
-
-		<div id="mapOptions">
-			Map Options
-			<div id="mapOptionsPanel">
-				<div class='row'>
-					<label for="var_range">Biome Range:</label><input id="var_range" onchange="map.updateVar('range',this.value)" value="" />m
-				</div>
-				<div class='row'>
-					<label for="var_pwidth">Line Render Pixel Width:</label><input id="var_pwidth" onchange="map.updateVar('pwidth',this.value,'uint_1')" value="" />px
-				</div>
-				<div class='row'>
-					<label for="var_pwidth">Boundary Fuzziness:</label><input id="var_fuzzy" onchange="map.updateVar('fuzzy',this.value)" value="" />m
-				</div>
-				<div class='row'>
-					<label for="var_lineDelay">Line Render Speed:</label><input id="var_lineDelay" onchange="map.updateVar('lineDelay',this.value)" value="" />ms
-				</div>
-				<div class='row'>
-					<label for="var_aa">Anti-alias radius:</label><input id="var_aa" onchange="map.updateVar('aa',this.value,'uint')" value="" />px
-				</div>
-				</div>
-		</div>
+	<div id="mainClip">
 		
+		<canvas id="canvasbg" width="100%" height="100%">
+			Ye need HTML5-compatible browser for this.
+		</canvas>
+		<canvas id="canvas" width="100%" height="100%">
+			Ye need HTML5-compatible browser for this.
+		</canvas>
+		<div id="hovers"><!--e--></div>
+		<div id='buttonBar'>
+			<div class="floatRight block">
+				<div class='col'>Cursor:</div>
+				<div class='col' id="xpos"></div>
+				<div class='col' id="zpos"></div>
+				<div class='col' id="biome"></div>
+			</div>
+
+			<!--<a href="/deneb1/" target='_blank'>Archived Deneb 1</a>
+			<a href="/user/login">Login</a>-->
+			<button onclick="map.reset()" >Reset</button>
+			<button onclick="map.zoomIn()">Zoom In</button>
+			<button onclick="map.zoomOut()">Zoom Out</button>
+			<button onclick="map.toggleWorld()" id="toggleButton">Switch to Netherworld</button>
+
+			<div id="mapOptions">
+				Map Options
+				<div id="mapOptionsPanel">
+					<div class='row'>
+						<label for="var_range">Biome Range:</label><input id="var_range" onchange="map.updateVar('range',this.value)" value="" />m
+					</div>
+					<div class='row'>
+						<label for="var_pwidth">Line Render Pixel Width:</label><input id="var_pwidth" onchange="map.updateVar('pwidth',this.value,'uint_1')" value="" />px
+					</div>
+					<div class='row'>
+						<label for="var_pwidth">Boundary Fuzziness:</label><input id="var_fuzzy" onchange="map.updateVar('fuzzy',this.value)" value="" />m
+					</div>
+					<div class='row'>
+						<label for="var_lineDelay">Line Render Speed:</label><input id="var_lineDelay" onchange="map.updateVar('lineDelay',this.value)" value="" />ms
+					</div>
+					<div class='row'>
+						<label for="var_aa">Anti-alias radius:</label><input id="var_aa" onchange="map.updateVar('aa',this.value,'uint')" value="" />px
+					</div>
+					</div>
+			</div>
+			
+		</div>
 	</div>
 	
 	<div id="photoViewer"></div>

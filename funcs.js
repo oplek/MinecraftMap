@@ -1116,62 +1116,20 @@ var map = {
 					var col;
 					if ( min_index >= 0 ) {
 						//Color square
+
+						/* Todo - maybe phase out switch statement entirely */
 						switch(biome) {
-							case "cherry blossom grove":
-								col = pick(canvas.vars.terrainTexture["cherry blossom grove"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "birch forest":
-								col = pick(canvas.vars.terrainTexture["birch forest"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "canyon":
-								col = pick(canvas.vars.terrainTexture["canyon"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "beach":
-							case "desertHills":
-							case "desert":
-								col = pick(canvas.vars.terrainTexture.desert,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "kelp forest":
-							case "island":
-							case "ocean":
-								col = pick(canvas.vars.terrainTexture.ocean,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "swamp":
-								col = pick(canvas.vars.terrainTexture.swamp,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case 'stone beach':
-							case "mountain":
-							case "extremeHills":
-								col = pick(canvas.vars.terrainTexture.extremeHills,Math.round((ex)/s),Math.round((ey)/s));
-							break;							
-							case "mesa":
-							case "mesa plateau":
-								col = pick(canvas.vars.terrainTexture.mesa,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "pasture":
-								col = pick(canvas.vars.terrainTexture.pasture,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "roofed forest":
-								col = pick(canvas.vars.terrainTexture["roofed forest"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "bamboo forest":
-							case "hillyForest":
-							case "taiga":
-							case "forest":
-							case "jungle":
-								col = "#9cff79";
-							break;
-							case "glacier":
-							case "snowy dead forest":
-							case "ice":
-								col = "#ffffff";					
-							break;
 							default:
-								col = pick(canvas.vars.terrainTexture.plains,Math.round((ex)/s),Math.round((ey)/s));	
+								if ( canvas.vars.terrainTexture[biome] ) {
+									col = pick(canvas.vars.terrainTexture[biome],Math.round((ex)/s),Math.round((ey)/s));
+								} else {
+									//col = pick(canvas.vars.terrainTexture.plains,Math.round((ex)/s),Math.round((ey)/s));	
+									col = "#d4ff88";	
+								}
 							break;
 						}
 					} else {
-						col = "#333333";	
+						col = "#111111";	
 					}
 					
 				var c = canvas.color_to_array(col);
@@ -1824,7 +1782,6 @@ function pickRandom(list) {
 }
 
 function pick(list,x,y) {
-	
 	var ix = ((x % list[0].length) + list[0].length) % list[0].length;
 	var iy = ((y % list.length) + list.length) % list.length;
 	if ( ix >= 0 && iy >= 0 ) {
