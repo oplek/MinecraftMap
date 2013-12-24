@@ -12,52 +12,52 @@
 		'desert','desertHills','desertM','mesa','mesa bryce','mesa plateau','mesa plateau f',
 		'mesa plateau fm','mesa plateau m','extremeHills','extremeHillsM','extremeHillsPlus',
 		'iceMountain','mushroomisland','mushroomisland shore'
-	);
+	).sort();
 	
 	function get_each_sample(){
 		
 		var img = document.getElementById('theimage');
-		var canvas = document.getelementById('thecanvas');
-		var sample = canvas.getcontext("2d");
+		var canvas = document.getElementById('thecanvas');
+		var sample = canvas.getContext("2d");
+		var terrains = new Array();
 		
 		for (biome in todo){
-			
-			sample.drawImage(img, 0, 0, img.height, img.width);
 			var fname = 'samples/' + todo[biome] + '.png';
-			var hexArray = getHexArray(sample);
-			
+			img.src = fname;
+			sample.drawImage(img, 0, 0, img.height, img.width);
+			var hexArray = get_hex_arrays(sample, img);
+			terrains[biome] =  '"' + todo[biome] + '": ' + hexArray;
 		}
 		
-	}
-	
-	function write_image(img, fname, sample){
-		
-	}
-	
-	function getHexArray(){
-		
-		var img = document.getElementById('theimage');
-		var thecanvas = document.getElementById('thecanvas');
 		var results = document.getElementById('results');
-		var icon = thecanvas.getContext("2d");
-		icon.drawImage(img, 0, 0, img.height, img.width);
+		results.innerHTML = "terrainTexture: {<BR>" + terrains.join(",<BR>") + "<BR>}";
+		
+	}
+	
+	function get_hex_arrays(sample, img){
 		
 		var rows = new Array();
 		for (var y = 0; y < img.height; y++){
 			var row = new Array();
 			for (var x = 0; x < img.width; x++){
-				var pix = icon.getImageData(x, y, 1, 1);
-			    var color = "'#" + getHex(pix.data[0]) + getHex(pix.data[1]) + getHex(pix.data[2]) + "'";
+				var pix = sample.getImageData(x, y, 1, 1);
+			    var color = "'#"
+					+ get_color_hex(pix.data[0])
+					+ get_color_hex(pix.data[1])
+					+ get_color_hex(pix.data[2]) + "'";
 				row[x] = color;
 			}
 			rows[y] = "[" + row.join(', ') + "]";
 		}
-		results.innerHTML = "[" + rows.join(",<BR>") + "]";
+		return "[" + rows.join(",<BR>") + "]";
+		
 	}
 	
-	function getHex(num) {
+	function get_color_hex(num) {
+		
 	    var hex = "00" + Number(num).toString(16);
 	    return hex.substring(hex.length - 2);
+		
 	}
 	
 	</script>
