@@ -1,15 +1,4 @@
 
-/*
-	To create a new biome texture/color:
-	
-	1) Add in the texture, using the machine name, in canvas.vars.terrainTexture
-	2) Add in a representative average color in map.drawBGTerrain()
-	3) Add in the texture renderer (or color) in map.drawBGTerrainLine_old()
-	4) Basically, make the same change in map.drawBGTerrainLine()
-	5) Add in an official label in var "labels", at the bottom
-*/
-
-
 // Drawing Object
 var canvas = {
 	vars: {
@@ -443,7 +432,10 @@ var canvas = {
 			['#a4c2a0', '#bd8248', '#336600', '#336600', '#336600', '#97ba93', '#663300', '#9bbc97'],
 			['#9bbc97', '#9bbc97', '#336600', '#336600', '#336600', '#aa733e', '#b57b42', '#336600'],
 			['#336600', '#336600', '#92b68d', '#663300', '#99bb95', '#bd8249', '#336600', '#336600']]
-			}	
+			}
+		,terrainSimpleTextures: { 
+			//Automatically cached on startup
+		}
 	},
 
 	//Figure out the map scale
@@ -510,6 +502,33 @@ var canvas = {
 			}
 		}catch(e) {
 			console.log("Error initializing canvas: " + e.message);
+		}
+		
+		//Automatically average and determine average colors of textures
+		var ex, ey, num, avg, sum, col;
+		for(var tex in canvas.vars.terrainTexture) {
+			num = 0;
+			sum = [0,0,0];
+			for(ey = 0; ey < 4 && ey < canvas.vars.terrainTexture[tex].length; ey++) {
+				for( ex = 0; ex < 4 && ex < canvas.vars.terrainTexture[tex][ey].length; ex++) {
+					col = canvas.color_to_array(canvas.vars.terrainTexture[tex][ey][ex]);
+					sum[0] += col[0];
+					sum[1] += col[1];
+					sum[2] += col[2];
+					num++;
+				}
+			}
+			
+			//Average
+			sum[0] /= num;
+			sum[1] /= num;
+			sum[2] /= num;
+			
+			sum[0] = Math.floor(sum[0]);
+			sum[1] = Math.floor(sum[1]);
+			sum[2] = Math.floor(sum[2]);
+			
+			canvas.vars.terrainSimpleTextures[tex] = "rgb(" + sum.join(',') + ")";
 		}
 		
 		setInterval(canvas.updatePhotoViewer,500);
@@ -1030,54 +1049,13 @@ var map = {
 				//console.log(min,min_index,biome);
 				
 				if ( min_index >= 0 ) {
-					//Color square
-					switch(biome) {
-						case "canyon":
-							canvas.square(ex,ey,s,"#868695",true);
-						break;
-						case "beach":
-						case "desertHills":
-						case "desert":
-							canvas.square(ex,ey,s,"#ffe595",true);
-						break;
-						case "kelp forest":
-						case "island":
-						case "ocean":
-							canvas.square(ex,ey,s,"#98eaff",true);
-						break;
-						case "swamp":
-							canvas.square(ex,ey,s,"#60f96b",true);
-						break;						
-						case "mesa":
-						case "mesa plateau":
-							canvas.square(ex,ey,s,"#FFB973",true);
-						break;
-						case 'stone beach':
-						case "mountain":
-						case "hillyForest":
-						case "taiga":
-						case "forest":
-						case "swamp":
-						case "jungle":
-						case "extremeHills":
-							canvas.square(ex,ey,s,"#9cff79",true);
-						break;
-						case "roofed forest":
-						case "birch forest":
-							canvas.square(ex,ey,s,"#60f96b",true);
-						break;
-						case "pasture":
-							canvas.square(ex,ey,s,"#FFFF26",true);
-						break;
-						case "glacier":
-						case "snowy dead forest":
-						case "ice":
-							canvas.square(ex,ey,s,"#ffffff",true);					
-						break;
-						default:
-							canvas.square(ex,ey,s,"#d4ff88",true);					
-						break;
+					
+					if ( canvas.vars.terrainSimpleTextures[biome] ) {
+						canvas.square(ex,ey,s,canvas.vars.terrainSimpleTextures[biome],true);	
+					} else { //undefined
+						canvas.square(ex,ey,s,"#d4ff88",true);	
 					}
+					
 				}
 			}
 		}
@@ -1842,107 +1820,3 @@ function setCookie(c_name,value,exdays)
 	var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
 	document.cookie=c_name + "=" + c_value;
 }
-
-var labels = {
-	"desert":"Desert",
-	"ocean":"Ocean",
-	"river":"River",
-	"swamp":"Swamp",
-	"jungle":"Jungle",
-	"plains":"Plains",
-	"beach":"Beach",
-	"forest":"Forest",
-	"taiga":"Taiga",
-	"desertHills":"Desert Hills",
-	"hillyForest":"Hilly forest",
-	"extremeHills":"Extreme Hills",
-	"alps":"Alps",
-	"arctic":"Arctic",
-	"badlands":"Badlands",
-	"bamboo forest":"Bamboo Forest",
-	"bayou":"Bayou",
-	"birch forest":"Birch Forest",
-	"bog":"Bog",
-	"boneyard":"Boneyard",
-	"boreal forest":"Boreal Forest",
-	"brushland":"Brushland",
-	"canyon":"Canyon",
-	"chaparral":"Chaparral",
-	"cherry blossom grove":"Cherry Blossom Grove",
-	"coniferous forest":"Coniferous Forest",
-	"corrupted sands":"Corrupted Sands",
-	"crag":"Crag",
-	"dead forest":"Dead Forest",
-	"deadlands":"Deadlands",
-	"dead swamp":"Dead Swamp",
-	"deciduous forest":"Deciduous Forest",
-	"dunes":"Dunes",
-	"fen":"Fen",
-	"field":"Field",
-	"frost forest":"Frost Forest",
-	"fungi forest":"Fungi Forest",
-	"garden":"Garden",
-	"glacier":"Glacier",
-	"grassland":"Grassland",
-	"gravel beach":"Gravel Beach",
-	"grove":"Grove",
-	"heathland":"Heathland",
-	"highland":"Highland",
-	"hot springs":"Hot Springs",
-	"icy hills":"Icy Hills",
-	"jade cliffs":"Jade Cliffs",
-	"kelp forest":"Kelp Forest",
-	"lush desert":"Lush Desert",
-	"lush swamp":"Lush Swamp",
-	"mangrove":"Mangrove",
-	"maple woods":"Maple Woods",
-	"marsh":"Marsh",
-	"meadow":"Meadow",
-	"mesa":"Mesa",
-	"moor":"Moor",
-	"mountain":"Mountain",
-	"mystic grove":"Mystic Grove",
-	"oasis":"Oasis",
-	"ominous woods":"Ominous Woods",
-	"orchard":"Orchard",
-	"origin valley":"Origin Valley",
-	"outback":"Outback",
-	"pasture":"Pasture",
-	"phantasmagoric inferno":"Phantasmagoric Inferno",
-	"polar":"Polar",
-	"prairie":"Prairie",
-	"promised land":"Promised Land",
-	"quagmire":"Quagmire",
-	"rainforest":"Rainforest",
-	"redwood forest":"Redwood Forest",
-	"roofed forest":"Roofed Forest",
-	"sacred springs":"Sacred Springs",
-	"savanna":"Savanna",
-	"scrubland":"Scrubland",
-	"seasonal forest":"Seasonal Forest",
-	"shrubland":"Shrubland",
-	"shield":"Shield",
-	"sludgepit":"Sludgepit",
-	"snowy coniferous forest":"Snowy Coniferous Forest",
-	"snowy dead forest":"Snowy Dead Forest",
-	"spruce woods":"Spruce Woods",
-	"steppe":"Steppe",
-	"temperate rainforest":"Temperate Rainforest",
-	"thicket":"Thicket",
-	"timber":"Timber",
-	"tropical rainforest":"Tropical Rainforest",
-	"tropics":"Tropics",
-	"tundra":"Tundra",
-	"undergarden":"Undergarden",
-	"volcano":"Volcano",
-	"wasteland":"Wasteland",
-	"wetland":"Wetland",
-	"woodland":"Woodland",
-	"canyon ravine":"Canyon Ravine",
-	"meadow forest":"Meadow Forest",
-	"thick ominous woods":"Thick Ominous Woods",
-	"pasture meadow":"Pasture Meadow",
-	"thinned pasture":"Thinned Pasture",
-	"thick shrubland":"Thick Shrubland",
-	"thinned timber":"Thinned Timber"
-};

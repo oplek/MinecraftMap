@@ -126,6 +126,21 @@ function _misc_update(&$nodeSaving) {
 	$out .= "\"overworld\":[" . implode(",\n",$overworld) . "],\n\"netherworld\":[" . implode(",\n",$netherworld) . "]";
 	
 	$out .= "};";
+	
+	//Stage 2 - output labels
+	$out .= "\n\nvar labels = {\n";
+	
+	$all_fields = field_info_fields();
+	$allowed_values = list_allowed_values($all_fields["field_type"]);
+	
+	foreach($allowed_values as $k=>$v) {
+		if ( $k[0] != '-' ) {
+			$out .= "\"{$k}\": \"{$v}\",\n";
+		}	
+	}
+	
+	$out .= "\"nop\":false};\n";
+	
 	file_put_contents("sites/default/files/data.js",$out);
 
 }
