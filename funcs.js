@@ -883,7 +883,8 @@ var map = {
 		aa:	cLoadInt('aa',0),					//Anti-aliasing radius
 		pointCache: false,					//Localized cache of biomes
 		pointCacheLim: 1500,				//How many pixels before the pointCache resets,
-		origin: {x:136,z:172}
+		origin: {x:136,z:172},
+		newline: true
 	},
 
 	
@@ -1166,64 +1167,19 @@ var map = {
 					
 					//console.log(min,min_index,biome);
 					var col;
-					if ( min_index >= 0 ) { 
+					if ( min_index >= 0 ) {
 						//Color square
-						switch(biome) {
-							case "cherry blossom grove":
-								col = pick(canvas.vars.terrainTexture["cherry blossom grove"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "birch forest":
-								col = pick(canvas.vars.terrainTexture["birch forest"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "canyon":
-								col = pick(canvas.vars.terrainTexture["canyon"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "beach":
-							case "desertHills":
-							case "desert":
-								col = pick(canvas.vars.terrainTexture.desert,Math.round((ex+ix)/s),Math.round((ey+iy)/s));
-							break;
-							case "kelp forest":
-							case "island":
-							case "ocean":
-								col = pick(canvas.vars.terrainTexture.ocean,Math.round((ex+ix)/s),Math.round((ey+iy)/s));
-							break;
-							case "swamp":
-								col = pick(canvas.vars.terrainTexture.swamp,Math.round((ex+ix)/s),Math.round((ey+iy)/s));
-							break;
-							case "mesa":
-							case "mesa plateau":
-								col = pick(canvas.vars.terrainTexture.mesa,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case 'stone beach':
-							case "mountain":
-							case "extremeHills":
-								col = pick(canvas.vars.terrainTexture.extremeHills,Math.round((ex+ix)/s),Math.round((ey+iy)/s));
-							break;
-							case "pasture":
-								col = pick(canvas.vars.terrainTexture.pasture,Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "roofed forest":
-								col = pick(canvas.vars.terrainTexture["roofed forest"],Math.round((ex)/s),Math.round((ey)/s));
-							break;
-							case "bamboo forest":
-							case "hillyForest":
-							case "taiga":
-							case "forest":
-							case "jungle":
-								col = "#9cff79";
-							break;
-							case "glacier":
-							case "snowy dead forest":
-							case "ice":
-								col = "#ffffff";					
-							break;
-							default:
-								col = pick(canvas.vars.terrainTexture.plains,Math.round((ex+ix)/s),Math.round((ey+iy)/s));	
-							break;
+
+						/* Todo - maybe phase out switch statement entirely */
+						if ( canvas.vars.terrainTexture[biome] ) {
+							col = pick(canvas.vars.terrainTexture[biome],Math.round((ex)/s),Math.round((ey)/s));
+						} else {
+							//col = pick(canvas.vars.terrainTexture.plains,Math.round((ex)/s),Math.round((ey)/s));	
+							col = "#d4ff88";	
 						}
+						
 					} else {
-						col = "#000000";	
+						col = "#111111";	
 					}
 				
 				    
@@ -1333,23 +1289,23 @@ var map = {
 
 	//Look at preprocessed terrain and figure out terrain
 	//* Currently Unused
-	drawBGTerrainLine2: function(line) {
+	drawBGTerrainLine2: function(line,rows) {
 		map.vars.pointCache = false;
 		map.vars.pointCachePx = 0;
 		
 	
 		var s = map.vars.pwidth;
+		var pCPi = s/map.vars.mapScale; //s converted to pointCachePx increment
 		var coords,col,e,dist,min,min_index,biome;
 		for(var ex = 0; ex < canvas.vars.c_bg.width ; ex += s) {
-			ey = line;	
-
-			coords = map.canvas_to_map(ex,ey);
-			
+		
 			//Determine which terrain point is closest
 			min = 10000000000;
 			min_index = -1;
 			
+			
 			if ( map.vars.pointCache == false || map.vars.pointCachePx > map.vars.pointCacheLim ) {
+				coords = map.canvas_to_map(ex,line);
 				map.vars.pointCache = [];
 				
 				for(var i = 0; i < data.terrain.overworld.length; i++) {
@@ -1357,10 +1313,10 @@ var map = {
 				
 					//Remember
 					if ( 
-						 //e.x > coords.x - map.vars.range &&
-						// e.x < coords.x + map.vars.range + map.vars.pointCacheLim &&
+						 e.x > coords.x - map.vars.range &&
+						 e.x < coords.x + map.vars.range + map.vars.pointCacheLim &&
 						 e.z > coords.y - map.vars.range &&
-						 e.z < coords.y + map.vars.range ) 
+						 e.z < coords.y + map.vars.range + (pCPi * rows) ) 
 					{
 						map.vars.pointCache.push(e);
 					}
@@ -1370,74 +1326,49 @@ var map = {
 				map.vars.pointCachePx = 0;
 				
 			} 
+		
+			for(var ey = line; ey < canvas.vars.c_bg.height && ey < line + s*rows; ey += s) {
+				coords = map.canvas_to_map(ex,ey);
 				
-			map.vars.pointCachePx += s;
-			
-			for(var i = 0; i < map.vars.pointCache.length; i++) {
-				e = map.vars.pointCache[i];
-				dist = map.distSqr(e.x,e.z,coords.x,coords.y);
-			
-				if ( dist < map.vars.range * map.vars.range && dist < min) {
-					min = dist;
-					min_index = i;
-					biome = e.type;
+				//Determine which terrain point is closest
+				min = 10000000000;
+				min_index = -1;
+				
+				for(var i = 0; i < map.vars.pointCache.length; i++) {
+					e = map.vars.pointCache[i];
+					dist = map.distSqr(e.x,e.z,coords.x,coords.y);
+				
+					if ( dist < map.vars.range * map.vars.range && dist < min) {
+						min = dist;
+						min_index = i;
+						biome = e.type;
+					}
 				}
-			}
-			
-			
-			//console.log(min,min_index,biome);
-			var col;
-			if ( min_index >= 0 ) {
-				//Color square
-				switch(biome) {
-					case "beach":
-					case "desertHills":
-					case "canyon":
-						col = pick(canvas.vars.terrainTexture["canyon"],Math.round((ex)/s),Math.round((ey)/s));
-					break;
-					case "desert":
-						col = pick(canvas.vars.terrainTexture.desert,Math.round((ex)/s),Math.round((ey)/s));
+				
+				
+				//console.log(min,min_index,biome);
+				var col;
+				if ( min_index >= 0 ) {
+					//Color square
 
-					break;
-					case "kelp forest":
-					case "island":
-					case "ocean":
-						col = pick(canvas.vars.terrainTexture.ocean,Math.round((ex)/s),Math.round((ey)/s));
-					break;
-					case "swamp":
-						col = pick(canvas.vars.terrainTexture.swamp,Math.round((ex)/s),Math.round((ey)/s));
-					break;
-					case "mountain":
-					case "extremeHills":
-						col = pick(canvas.vars.terrainTexture.extremeHills,Math.round((ex)/s),Math.round((ey)/s));
-					break;
-					case "bamboo forest":
-					case "hillyForest":
-					case "forest":
+					/* Todo - maybe phase out switch statement entirely */
+					if ( canvas.vars.terrainTexture[biome] ) {
+						col = pick(canvas.vars.terrainTexture[biome],Math.round((ex)/s),Math.round((ey)/s));
+					} else {
+						col = "#d4ff88";	
+					}
 					
-					case "jungle":
-						col = "#9cff79";
-					break;
-					case "glacier":
-					case "snowy dead forest":
-					case "taiga":
-					case "ice":
-						col = "#ffffff";					
-					break;
-					case 'chaparral':
-					case 'highland':
-					default:
-						col = pick(canvas.vars.terrainTexture.plains,Math.round((ex)/s),Math.round((ey)/s));	
-					break;
+				} else {
+					col = "#111111";	
 				}
-			} else {
-				col = "#333333";	
+				
+				
+				//col = map.drawSection(coords,col);
+				
+				canvas.square(ex,ey,s,col,true);
 			}
 			
-			
-			//col = map.drawSection(coords,col);
-			
-			canvas.square(ex,ey,s,col,true);
+			map.vars.pointCachePx += pCPi;
 		}
 	},
 	
@@ -1445,30 +1376,34 @@ var map = {
 	updateBGIncrementReset: function() {
 		map.vars.bgRenderLine = 0;
 		clearTimeout(map.vars.update_timer_id);
-		//if ( map.vars.world_index == 0 ) {
-			
-			map.vars.update_timer_id = setTimeout(map.updateBgIncrementally,map.vars.lineDelay);
-		//}
+		map.vars.update_timer_id = setTimeout(map.updateBgIncrementally,map.vars.lineDelay);
 	},
 	
 	//Incrementally update background if not moving
 	updateBgIncrementally: function() {
+		var newLineNum = 30;
 		
 		if (map.vars.aa > 0 ) {
 			map.drawBGTerrainLine(map.vars.bgRenderLine);
 		} else {
 			if ( map.vars.newline ) {
-				map.drawBGTerrainLine2(map.vars.bgRenderLine);		
+				map.drawBGTerrainLine2(map.vars.bgRenderLine,newLineNum);		
 			} else {
 				map.drawBGTerrainLine_old(map.vars.bgRenderLine);		
 			
 			}
 		}
-		map.vars.bgRenderLine += map.vars.pwidth;
+		
+		if ( map.vars.newline ) {
+			map.vars.bgRenderLine += map.vars.pwidth * newLineNum;
+		} else {
+			map.vars.bgRenderLine += map.vars.pwidth;
+		}
 		
 		if ( map.vars.bgRenderLine < canvas.vars.c_bg.height  ) { 
 			map.vars.update_timer_id = setTimeout(map.updateBgIncrementally,map.vars.lineDelay);
 		}
+		
 	},
 	
 	//Reset map to default
