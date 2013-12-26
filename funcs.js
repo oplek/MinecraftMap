@@ -1363,7 +1363,15 @@ var map = {
 				}
 				
 				
-				//col = map.drawSection(coords,col);
+				var c = canvas.color_to_array(col);
+				
+				if ( map.vars.world_index == 1 ) {	
+					c = canvas.desaturate(c[0],c[1],c[2]);
+				}
+
+				col = "rgb(" + c.join(',') + ")";
+
+				col = map.drawSection(coords,col);
 				
 				canvas.square(ex,ey,s,col,true);
 			}
