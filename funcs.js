@@ -1661,18 +1661,15 @@ var map = {
 	findClosestBiome: function(x, y) {
 		
 		//Determine which terrain point is closest
-		min = 10000000000;
-		min_index = -1;
+		var min = 10000000000;
+		var min_index = -1;
 		
 		var r = map.vars.fuzzy;
 		for(var i = 0; i < data.terrain.overworld.length; i++) {
 			e = data.terrain.overworld[i];
-			dist = map.distSqr(e.x,e.z,x,y);
 			
-			//var n = map.vars.perlin.noise(x/10,y/10,0);
-			//var rand = (n+1) * r*r/10;
-						
-			if ( dist < map.vars.range * map.vars.range) {
+			dist = map.distSqr(e.x,e.z,x,y);
+			if ( dist < map.vars.range * map.vars.range && dist < min) {
 				min = dist;
 				min_index = i;
 				biome = e.type;
