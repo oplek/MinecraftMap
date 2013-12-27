@@ -1384,7 +1384,9 @@ var map = {
 	updateBGIncrementReset: function() {
 		map.vars.bgRenderLine = 0;
 		clearTimeout(map.vars.update_timer_id);
-		map.vars.update_timer_id = setTimeout(map.updateBgIncrementally,map.vars.lineDelay);
+		if ( !map.vars.isDragging ) {
+			map.vars.update_timer_id = setTimeout(map.updateBgIncrementally,map.vars.lineDelay);
+		}
 	},
 	
 	//Incrementally update background if not moving
@@ -1499,7 +1501,6 @@ var map = {
 	//Mouse down
 	mouseDown: function(e) {
 		clearTimeout(map.vars.update_timer_id);
-		map.vars.isDragging 
 		map.vars.isDragging = true;
 		map.vars.startX = e.pageX ? e.pageX : e.screenX;
 		map.vars.startY = e.pageY ? e.pageY : e.screenY;
