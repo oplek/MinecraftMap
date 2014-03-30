@@ -667,6 +667,48 @@ var canvas = {
 		
 	},	
 	
+	//  
+	//   #
+	//   #
+	// # #
+ 	// #### #
+	drawRuinBenign: function(x,y,label) {
+		
+		canvas.squareGrid(x,y,[
+			[false,false,"#444477",false,false,false],
+			[false,false,"#444477",false,false,false],
+			[false,false,"#444477",false,false,false],
+			["#444477",false,"#444477",false,false,"#444477"],
+			["#444477","#444477","#444477","#444477",false,"#444477"],
+		]);
+		if ( label ) {
+			canvas.textRect((x+canvas.vars.scale*6),(y-canvas.vars.scale*2),label);
+			canvas.text((x+canvas.vars.scale*6),(y-canvas.vars.scale*2),label);
+		}
+		
+	},	
+	
+	//  
+	//   #
+	//   #
+	// # #
+ 	// #### #
+	drawRuinHostile: function(x,y,label) {
+		
+		canvas.squareGrid(x,y,[
+			[false,false,"#aa4444",false,false,false],
+			[false,false,"#aa4444",false,false,false],
+			[false,false,"#aa4444",false,false,false],
+			["#aa4444",false,"#aa4444",false,false,"#aa4444"],
+			["#aa4444","#aa4444","#aa4444","#aa4444",false,"#aa4444"],
+		]);
+		if ( label ) {
+			canvas.textRect((x+canvas.vars.scale*6),(y-canvas.vars.scale*2),label);
+			canvas.text((x+canvas.vars.scale*6),(y-canvas.vars.scale*2),label);
+		}
+		
+	},
+	
 	// #  #
 	//  ##
 	// #  #
@@ -980,6 +1022,12 @@ var map = {
 			switch(entry.type) {
 				case "castle":
 					canvas.drawCastle(x,y,(entry.name ? entry.name + hasPortal : "Castle" + hasPortal));
+				break;
+				case "ruinb":
+					canvas.drawRuinBenign(x,y,(entry.name ? entry.name + hasPortal : "Castle" + hasPortal));
+				break;
+				case "ruinh":
+					canvas.drawRuinHostile(x,y,(entry.name ? entry.name + hasPortal : "Castle" + hasPortal));
 				break;
 				case "portal":
 					if ( !entry.ownedBy ) {
