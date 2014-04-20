@@ -495,8 +495,8 @@ var canvas = {
 					.bind("mousedown",map.mouseDown)
 					.bind("mouseup",map.mouseUp)
 					.bind("mouseout",map.mouseOut)
-					.bind("mousemove", map.mouseMove);
-					
+					.bind("mousemove", map.mouseMove)
+					.bind("dblclick",map.editPoint);
 				
 			} else {
 			}
@@ -531,7 +531,7 @@ var canvas = {
 			canvas.vars.terrainSimpleTextures[tex] = "rgb(" + sum.join(',') + ")";
 		}
 		
-		setInterval(canvas.updatePhotoViewer,500);
+		//setInterval(canvas.updatePhotoViewer,500);
 	},
 	
 	//Basic Draw Functions
@@ -926,7 +926,8 @@ var map = {
 		pointCache: false,					//Localized cache of biomes
 		pointCacheLim: 1500,				//How many pixels before the pointCache resets,
 		origin: {x:136,z:172},
-		newline: true
+		newline: true,
+		lastCoord: {x:0,z:0}				//Last mouse coordinates in world
 	},
 
 	
@@ -1569,6 +1570,8 @@ var map = {
 	},
 	
 	addHotspots: function() {
+		return; //Currently disabled
+	
 		for(var i = 0; i < data.interactive[map.vars.world[map.vars.world_index]].length; i++) {
 			var entry = data.interactive[map.vars.world[map.vars.world_index]][i];
 			var coords = map.map_to_canvas(entry.coords.x,entry.coords.z);
@@ -1611,9 +1614,7 @@ var map = {
 		map.udpateCursorPosition(px,py);
 		map.vars.px = px;
 		map.vars.py = py;
-		
-		
-		
+	
 	},
 	
 	//Object is interacted with
@@ -1631,7 +1632,6 @@ var map = {
 		if ( map.vars.isDragging ) {
 			map.redraw(true);	
 		}
-				
 	},
 	
 	//Update the display of the cursor coordinates on the bottom-right
@@ -1641,6 +1641,7 @@ var map = {
 		var coords = map.canvas_to_map(x,y);
 		x = coords.x*netherScale;
 		y = coords.y*netherScale;
+		map.vars.lastCoord = {x:x,z:y};
 
 		$("#xpos").html("X: " + Math.round(x));
 		$("#zpos").html("Z: " + Math.round(y));
@@ -1726,6 +1727,8 @@ var map = {
 		map.vars.rangePixels = map.vars.range * map.vars.mapScale;
 		map.updateBGIncrementReset();
 		
+		
+		
 		//Setup option values
 		$("#var_range").val(map.vars.range);
 		$("#var_pwidth").val(map.vars.pwidth);
@@ -1744,6 +1747,51 @@ var map = {
 		setCookie(name,value,3000);
 		map.redraw();
 	
+	},
+	
+	editPoint: function() {
+		var range = 25/map.vars.mapScale;
+		var rangeSqr = range*range;
+		var x = map.vars.lastCoord.x;
+		var z = map.vars.lastCoord.z;
+		//alert("clicked " + Math.round(map.vars.lastCoord.x) + ", " + Math.round(map.vars.lastCoord.z) + " > " + range);
+		
+		var nid = false;
+		/*
+			biome: "plains"
+			coords: Object
+			name: "Plains 19"
+			nid: "695"
+			photos: Array[0]
+			portal: "0"
+			sample: true
+			scanned: true
+			type: "minor"
+		*/
+		
+		if ( map.vars.world_index == 0 ) { //overworld
+			var dx, dy;
+			for(var i = 0; i < data.overworld.length; i++) {
+				dx = data.overworld[i].coords.x - x;
+				dy = data.overworld[i].coords.z - z;
+				if ( dx*dx + dy*dy < rangeSqr ) {
+					window.open("/node/" + data.overworld[i].nid + "/edit",'_blank');
+					return;
+				}
+			}
+			
+		} else { //nether
+		
+			for(var i = 0; i < data.netherworld.length; i++) {
+				dx = data.netherworld[i].coords.x - x;
+				dy = data.netherworld[i].coords.z - z;
+				if ( dx*dx + dy*dy < rangeSqr ) {
+					window.open("/node/" + data.netherworld[i].nid + "/edit",'_blank');
+					return;
+				}
+			}
+		}
+
 	}
 }
 
