@@ -925,7 +925,7 @@ var map = {
 		aa:	cLoadInt('aa',0),					//Anti-aliasing radius
 		pointCache: false,					//Localized cache of biomes
 		pointCacheLim: 1500,				//How many pixels before the pointCache resets,
-		origin: {x:136,z:172},
+		origin: {x:0,z:0},
 		newline: true,
 		lastCoord: {x:0,z:0}				//Last mouse coordinates in world
 	},
@@ -1177,6 +1177,8 @@ var map = {
 				col = "rgb(" + c.join(',') + ")";
 
 				col = map.drawSection(coords,col);
+				col = map.drawClaims(coords,col);
+				
 				canvas.square(ex,ey,s,col,true);
 		}
 	},
@@ -1255,6 +1257,7 @@ var map = {
 				}
 				
 				newcol = map.drawSection(coords,newcol);	
+				newcol = map.drawClaims(coords,newcol);
 				
 				canvas.square(ex,ey,s,"rgb(" + newcol.join(',') + ")",true);
 		}
@@ -1271,7 +1274,7 @@ var map = {
 		var pi2 = Math.PI*2;
 		
 		//map.vars.origin.x,map.vars.origin.z
-		
+
 		//Calculate the coord range and angle
 		var dx = coords.x - map.vars.origin.x;
 		var dy = coords.y - map.vars.origin.z;
@@ -1317,9 +1320,59 @@ var map = {
 			return col;
 		}
 		
+		
+		
 		if ( type == "string" ) {
 		    c = "rgb(" + c.join(',') + ")";
 		}
+		
+		return c;
+	},
+	//Draw the region sections
+	drawClaims: function(coords,col) {
+	
+		var test =  Math.random()*10000 < 10;
+		
+	
+		var type = typeof(col);
+		var c = col;
+		if ( type == "string" ) {
+		    c = canvas.color_to_array(c);
+		}
+
+		//Calculate the coord range and angle
+		var dx,dz,c,dist,r2;
+		var pc;
+		var skip = false;
+		for(var i = 0; i < map.vars.claims.nodes.length; i++) {
+			if ( !skip ) {
+				
+				claim = map.vars.claims.nodes[i].node;
+				
+				dx = coords.x - claim.x;
+				dz = coords.y - claim.z;
+				dist = dx*dx + dz*dz;
+				r2 = claim.r*claim.r;
+				
+				
+				if ( dist < r2) {
+					pc = map.vars.playerColors[claim.Player];
+					var blend = 10;
+					//change color
+					c[0] = Math.floor((pc[0] + c[0]*blend) / (blend+1));
+					c[1] = Math.floor((pc[1] + c[1]*blend) / (blend+1));
+					c[2] = Math.floor((pc[2] + c[2]*blend) / (blend+1));
+					skip = true;
+				}
+			}
+		}		
+		
+		
+		//try {
+		if ( type == "string" ) {
+		    c = "rgb(" + c.join(',') + ")";
+		}
+		//}catch(e) { console.log(c); }
 		
 		return c;
 	},
@@ -1421,6 +1474,7 @@ var map = {
 				col = "rgb(" + c.join(',') + ")";
 
 				col = map.drawSection(coords,col);
+				col = map.drawClaims(coords,col);
 				
 				canvas.square(ex,ey,s,col,true);
 			}
@@ -1720,22 +1774,53 @@ var map = {
 	},
 	
 	init: function() {
-		map.peprocessData();
-		canvas.init();
-		map.redraw();
-		setInterval(map.updateMapCycle,30);
-		map.vars.rangePixels = map.vars.range * map.vars.mapScale;
-		map.updateBGIncrementReset();
+		//Get claims
+		var colors = ["#fff000","#ff00ff","#0f00ff","#f0ff0f","#00ff00","#0000ff","#ff0000","#00ffff"];
+		map.vars.playerColors = {};
+		map.vars.playerColorIndex = 0;
+		
+		$.getJSON("sites/default/files/claims.json",{r:Math.random()},function(data) {
+			//Preprocess data
+			map.vars.claims = data;
+			//try {
+				for(var i = 0; i < map.vars.claims.nodes.length; i++) {
+					c = map.vars.claims.nodes[i].node;
+					var m = c.Coordinates.match(/^([-.0-9]+),([-.0-9]+)$/);
+					if ( m ) {
+						map.vars.claims.nodes[i].node.x = Number(m[1]);
+						map.vars.claims.nodes[i].node.z = Number(m[2]);
+					} else {
+						map.vars.claims.nodes[i].node.x = -100000000;
+						map.vars.claims.nodes[i].node.z = -100000000;
+					}
+					map.vars.claims.nodes[i].node.r = Number(map.vars.claims.nodes[i].node.Radius);
+					
+					if ( !map.vars.playerColors[c.Player] ) {
+						map.vars.playerColors[c.Player] = canvas.color_to_array(colors[map.vars.playerColorIndex]);
+						map.vars.playerColorIndex++;
+					}
+				}
+			//}catch(e) { }
+			
+			map.peprocessData();
+			canvas.init();
+			map.redraw();
+			setInterval(map.updateMapCycle,30);
+			map.vars.rangePixels = map.vars.range * map.vars.mapScale;
+			map.updateBGIncrementReset();
+			
+			
+			
+			//Setup option values
+			$("#var_range").val(map.vars.range);
+			$("#var_pwidth").val(map.vars.pwidth);
+			$("#var_fuzzy").val(map.vars.fuzzy);
+			$("#var_lineDelay").val(map.vars.lineDelay);
+			$("#var_aa").val(map.vars.aa);
+			//map.addHotspots();
 		
 		
-		
-		//Setup option values
-		$("#var_range").val(map.vars.range);
-		$("#var_pwidth").val(map.vars.pwidth);
-		$("#var_fuzzy").val(map.vars.fuzzy);
-		$("#var_lineDelay").val(map.vars.lineDelay);
-		$("#var_aa").val(map.vars.aa);
-		map.addHotspots();
+		});
 	},
 	
 	updateVar: function(name,value,type) {
